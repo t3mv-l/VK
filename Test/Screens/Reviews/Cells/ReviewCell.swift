@@ -69,6 +69,7 @@ final class ReviewCell: UITableViewCell {
 
     fileprivate var config: Config?
 
+    fileprivate let avatarImageView = UIImageView()
     fileprivate let userNameLabel = UILabel()
     fileprivate let ratingImageView = UIImageView()
     fileprivate let reviewTextLabel = UILabel()
@@ -87,6 +88,10 @@ final class ReviewCell: UITableViewCell {
     override func layoutSubviews() {
         super.layoutSubviews()
         guard let layout = config?.layout else { return }
+        avatarImageView.frame = layout.avatarImageViewFrame
+        avatarImageView.layer.cornerRadius = ReviewCellLayout.avatarCornerRadius
+        avatarImageView.clipsToBounds = true
+        
         userNameLabel.frame = layout.userNameLabelFrame
         ratingImageView.frame = layout.ratingImageViewFrame
         reviewTextLabel.frame = layout.reviewTextLabelFrame
@@ -101,11 +106,17 @@ final class ReviewCell: UITableViewCell {
 private extension ReviewCell {
 
     func setupCell() {
+        setupAvatarImageView()
         setupUserNameTextLabel()
         setupRatingImageView()
         setupReviewTextLabel()
         setupCreatedLabel()
         setupShowMoreButton()
+    }
+    
+    func setupAvatarImageView() {
+        contentView.addSubview(avatarImageView)
+        avatarImageView.image = UIImage(named: "avatar")
     }
     
     func setupUserNameTextLabel() {
@@ -150,6 +161,7 @@ private final class ReviewCellLayout {
 
     // MARK: - Фреймы
     
+    private(set) var avatarImageViewFrame = CGRect.zero
     private(set) var userNameLabelFrame = CGRect.zero
     private(set) var ratingImageViewFrame = CGRect.zero
     private(set) var reviewTextLabelFrame = CGRect.zero
@@ -182,14 +194,20 @@ private final class ReviewCellLayout {
 
     /// Возвращает высоту ячейку с данной конфигурацией `config` и ограничением по ширине `maxWidth`.
     func height(config: Config, maxWidth: CGFloat) -> CGFloat {
-        let width = maxWidth - insets.left - insets.right
+        let contentX = avatarImageViewFrame.maxY + avatarToUsernameSpacing
+        let width = maxWidth - contentX - insets.right
 
         var maxY = insets.top
         var showShowMoreButton = false
+        
+        avatarImageViewFrame = CGRect(
+            origin: CGPoint(x: insets.left, y: insets.top),
+            size: Self.avatarSize
+        )
                 
         let userNameTextHeight = config.userName.boundingRect(width: width).size.height
         userNameLabelFrame = CGRect(
-            origin: CGPoint(x: insets.left, y: maxY),
+            origin: CGPoint(x: contentX, y: maxY),
             size: CGSize(width: width, height: userNameTextHeight)
         )
         maxY = userNameLabelFrame.maxY + usernameToRatingSpacing
@@ -201,7 +219,7 @@ private final class ReviewCellLayout {
             height: ratingConfig.starImage.size.height
         )
         ratingImageViewFrame = CGRect(
-            origin: CGPoint(x: insets.left, y: maxY),
+            origin: CGPoint(x: contentX, y: maxY),
             size: ratingImageSize
         )
         maxY = ratingImageViewFrame.maxY + ratingToTextSpacing
@@ -215,7 +233,7 @@ private final class ReviewCellLayout {
             showShowMoreButton = config.maxLines != .zero && actualTextHeight > currentTextHeight
 
             reviewTextLabelFrame = CGRect(
-                origin: CGPoint(x: insets.left, y: maxY),
+                origin: CGPoint(x: contentX, y: maxY),
                 size: config.reviewText.boundingRect(width: width, height: currentTextHeight).size
             )
             maxY = reviewTextLabelFrame.maxY + reviewTextToCreatedSpacing
@@ -223,7 +241,7 @@ private final class ReviewCellLayout {
 
         if showShowMoreButton {
             showMoreButtonFrame = CGRect(
-                origin: CGPoint(x: insets.left, y: maxY),
+                origin: CGPoint(x: contentX, y: maxY),
                 size: Self.showMoreButtonSize
             )
             maxY = showMoreButtonFrame.maxY + showMoreToCreatedSpacing
@@ -232,11 +250,11 @@ private final class ReviewCellLayout {
         }
 
         createdLabelFrame = CGRect(
-            origin: CGPoint(x: insets.left, y: maxY),
+            origin: CGPoint(x: contentX, y: maxY),
             size: config.created.boundingRect(width: width).size
         )
 
-        return createdLabelFrame.maxY + insets.bottom
+        return max(maxY, avatarImageViewFrame.maxY) + insets.bottom + showMoreToCreatedSpacing
     }
 
 }
