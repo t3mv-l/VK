@@ -10,6 +10,8 @@ struct ReviewCellConfig {
     let id = UUID()
     /// Имя пользователя, оставившего отзыв.
     let userName: NSAttributedString
+    /// Рейтинг.
+    let rating: Int
     /// Текст отзыва.
     let reviewText: NSAttributedString
     /// Максимальное отображаемое количество строк текста. По умолчанию 3.
@@ -36,6 +38,10 @@ extension ReviewCellConfig: TableCellConfig {
         cell.reviewTextLabel.attributedText = reviewText
         cell.reviewTextLabel.numberOfLines = maxLines
         cell.createdLabel.attributedText = created
+        
+        let renderer = RatingRenderer()
+        cell.ratingImageView.image = renderer.ratingImage(rating)
+        
         cell.config = self
     }
 
@@ -64,6 +70,7 @@ final class ReviewCell: UITableViewCell {
     fileprivate var config: Config?
 
     fileprivate let userNameLabel = UILabel()
+    fileprivate let ratingImageView = UIImageView()
     fileprivate let reviewTextLabel = UILabel()
     fileprivate let createdLabel = UILabel()
     fileprivate let showMoreButton = UIButton()
@@ -81,6 +88,7 @@ final class ReviewCell: UITableViewCell {
         super.layoutSubviews()
         guard let layout = config?.layout else { return }
         userNameLabel.frame = layout.userNameLabelFrame
+        ratingImageView.frame = layout.ratingImageViewFrame
         reviewTextLabel.frame = layout.reviewTextLabelFrame
         createdLabel.frame = layout.createdLabelFrame
         showMoreButton.frame = layout.showMoreButtonFrame
@@ -94,6 +102,7 @@ private extension ReviewCell {
 
     func setupCell() {
         setupUserNameTextLabel()
+        setupRatingImageView()
         setupReviewTextLabel()
         setupCreatedLabel()
         setupShowMoreButton()
@@ -101,6 +110,10 @@ private extension ReviewCell {
     
     func setupUserNameTextLabel() {
         contentView.addSubview(userNameLabel)
+    }
+    
+    func setupRatingImageView() {
+        contentView.addSubview(ratingImageView)
     }
 
     func setupReviewTextLabel() {
@@ -138,6 +151,7 @@ private final class ReviewCellLayout {
     // MARK: - Фреймы
     
     private(set) var userNameLabelFrame = CGRect.zero
+    private(set) var ratingImageViewFrame = CGRect.zero
     private(set) var reviewTextLabelFrame = CGRect.zero
     private(set) var showMoreButtonFrame = CGRect.zero
     private(set) var createdLabelFrame = CGRect.zero
@@ -172,18 +186,25 @@ private final class ReviewCellLayout {
 
         var maxY = insets.top
         var showShowMoreButton = false
+                
+        let userNameTextHeight = config.userName.boundingRect(width: width).size.height
+        userNameLabelFrame = CGRect(
+            origin: CGPoint(x: insets.left, y: maxY),
+            size: CGSize(width: width, height: userNameTextHeight)
+        )
+        maxY = userNameLabelFrame.maxY + usernameToRatingSpacing
         
-        if !config.userName.isEmpty() {
-            let currentUserNameTextHeight = (config.userName.font()?.lineHeight ?? .zero) * CGFloat(config.maxLines)
-            let actualUserNameTextHeight = config.userName.boundingRect(width: width).size.height
-            showShowMoreButton = config.maxLines != .zero && actualUserNameTextHeight > currentUserNameTextHeight
-            
-            userNameLabelFrame = CGRect(
-                origin: CGPoint(x: insets.left, y: maxY),
-                size: config.userName.boundingRect(width: width, height: currentUserNameTextHeight).size
-            )
-            maxY = userNameLabelFrame.maxY + usernameToRatingSpacing
-        }
+        let ratingConfig = RatingRendererConfig.default()
+        // Ширина - это ширина одной звезды и отступ, умноженные на количество звёзд и минус последний отступ
+        let ratingImageSize = CGSize(
+            width: (ratingConfig.starImage.size.width + ratingConfig.spacing) * CGFloat(ratingConfig.ratingRange.upperBound) - ratingConfig.spacing,
+            height: ratingConfig.starImage.size.height
+        )
+        ratingImageViewFrame = CGRect(
+            origin: CGPoint(x: insets.left, y: maxY),
+            size: ratingImageSize
+        )
+        maxY = ratingImageViewFrame.maxY + ratingToTextSpacing
 
         if !config.reviewText.isEmpty() {
             // Высота текста с текущим ограничением по количеству строк.
