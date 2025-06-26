@@ -113,7 +113,7 @@ extension ReviewsViewModel: UITableViewDataSource {
         } else {
             let config = state.items[indexPath.row]
             let cell = tableView.dequeueReusableCell(withIdentifier: config.reuseId, for: indexPath)
-            config.update(cell: cell)
+            config.update(cell: cell, ratingRenderer: ratingRenderer)
             return cell
         }
     }

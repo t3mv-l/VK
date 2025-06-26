@@ -9,7 +9,7 @@ protocol TableCellConfig {
 
     /// Метод для обновления текстов, изображений и другого содержимого ячейки.
     /// Вызывается из `cellForRowAt:` у `dataSource` таблицы.
-    func update(cell: UITableViewCell)
+    func update(cell: UITableViewCell, ratingRenderer: RatingRenderer)
 
     /// Метод возвращающий актуальную высоту ячейки.
     /// Вызывается из `heightForRowAt:` делегата таблицы.

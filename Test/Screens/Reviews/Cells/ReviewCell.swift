@@ -32,15 +32,14 @@ extension ReviewCellConfig: TableCellConfig {
 
     /// Метод обновления ячейки.
     /// Вызывается из `cellForRowAt:` у `dataSource` таблицы.
-    func update(cell: UITableViewCell) {
+    func update(cell: UITableViewCell, ratingRenderer: RatingRenderer) {
         guard let cell = cell as? ReviewCell else { return }
         cell.userNameLabel.attributedText = userName
         cell.reviewTextLabel.attributedText = reviewText
         cell.reviewTextLabel.numberOfLines = maxLines
         cell.createdLabel.attributedText = created
         
-        let renderer = RatingRenderer()
-        cell.ratingImageView.image = renderer.ratingImage(rating)
+        cell.ratingImageView.image = ratingRenderer.ratingImage(rating)
         
         cell.config = self
     }
@@ -98,7 +97,6 @@ final class ReviewCell: UITableViewCell {
         createdLabel.frame = layout.createdLabelFrame
         showMoreButton.frame = layout.showMoreButtonFrame
     }
-
 }
 
 // MARK: - Last (Count) Cell
@@ -158,12 +156,16 @@ private extension ReviewCell {
         contentView.addSubview(createdLabel)
     }
 
-    func setupShowMoreButton() {
+    private func setupShowMoreButton() {
         contentView.addSubview(showMoreButton)
         showMoreButton.contentVerticalAlignment = .fill
         showMoreButton.setAttributedTitle(Config.showMoreText, for: .normal)
+        showMoreButton.addTarget(self, action: #selector(showMoreTapped), for: .touchUpInside)
     }
-
+    
+    @objc private func showMoreTapped() {
+        config?.onTapShowMore(config?.id ?? UUID())
+    }
 }
 
 // MARK: - Layout
@@ -247,10 +249,18 @@ private final class ReviewCellLayout {
         maxY = ratingImageViewFrame.maxY + ratingToTextSpacing
 
         if !config.reviewText.isEmpty() {
-            // Высота текста с текущим ограничением по количеству строк.
-            let currentTextHeight = (config.reviewText.font()?.lineHeight ?? .zero) * CGFloat(config.maxLines)
-            // Максимально возможная высота текста, если бы ограничения не было.
+            let fontLineHeight = config.reviewText.font()?.lineHeight ?? .zero
             let actualTextHeight = config.reviewText.boundingRect(width: width).size.height
+            
+            let currentTextHeight: CGFloat
+            if config.maxLines == 0 {
+                // Максимально возможная высота текста, если бы ограничения не было.
+                currentTextHeight = actualTextHeight
+            } else {
+                // Высота текста с текущим ограничением по количеству строк.
+                currentTextHeight = fontLineHeight * CGFloat(config.maxLines)
+            }
+            
             // Показываем кнопку "Показать полностью...", если максимально возможная высота текста больше текущей.
             showShowMoreButton = config.maxLines != .zero && actualTextHeight > currentTextHeight
 
