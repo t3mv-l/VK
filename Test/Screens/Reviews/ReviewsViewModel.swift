@@ -10,7 +10,7 @@ final class ReviewsViewModel: NSObject {
     private let reviewsProvider: ReviewsProvider
     private let ratingRenderer: RatingRenderer
     private let decoder: JSONDecoder
-
+    
     init(
         state: State = State(),
         reviewsProvider: ReviewsProvider = ReviewsProvider(),
@@ -97,16 +97,25 @@ private extension ReviewsViewModel {
 // MARK: - UITableViewDataSource
 
 extension ReviewsViewModel: UITableViewDataSource {
+    //static - чтобы не было ошибки "Extensions must not contain stored properties"
+    private static let countLabelCell: Int = 1
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        state.items.count
+        state.items.count + Self.countLabelCell
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let config = state.items[indexPath.row]
-        let cell = tableView.dequeueReusableCell(withIdentifier: config.reuseId, for: indexPath)
-        config.update(cell: cell)
-        return cell
+        if indexPath.row == state.items.count {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "ReviewsCountCell", for: indexPath) as! ReviewsCountCell
+            cell.countLabel.text = "\(state.items.count) отзывов"
+            cell.selectionStyle = .none
+            return cell
+        } else {
+            let config = state.items[indexPath.row]
+            let cell = tableView.dequeueReusableCell(withIdentifier: config.reuseId, for: indexPath)
+            config.update(cell: cell)
+            return cell
+        }
     }
 
 }
@@ -114,9 +123,14 @@ extension ReviewsViewModel: UITableViewDataSource {
 // MARK: - UITableViewDelegate
 
 extension ReviewsViewModel: UITableViewDelegate {
+    private static let lastCellHeight: CGFloat = 50
 
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        state.items[indexPath.row].height(with: tableView.bounds.size)
+        if indexPath.row == state.items.count {
+            Self.lastCellHeight
+        } else {
+            state.items[indexPath.row].height(with: tableView.bounds.size)
+        }
     }
 
     /// Метод дозапрашивает отзывы, если до конца списка отзывов осталось два с половиной экрана по высоте.

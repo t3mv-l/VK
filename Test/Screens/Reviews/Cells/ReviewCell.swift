@@ -101,6 +101,28 @@ final class ReviewCell: UITableViewCell {
 
 }
 
+// MARK: - Last (Count) Cell
+final class ReviewsCountCell: UITableViewCell {
+    let countLabel = UILabel()
+    
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        countLabel.textAlignment = .center
+        countLabel.font = UIFont.reviewCount
+        countLabel.textColor = UIColor.reviewCount
+        contentView.addSubview(countLabel)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        countLabel.frame = contentView.bounds
+    }
+}
+
 // MARK: - Private
 
 private extension ReviewCell {
