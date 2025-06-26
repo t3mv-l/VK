@@ -8,6 +8,8 @@ struct ReviewCellConfig {
 
     /// Идентификатор конфигурации. Можно использовать для поиска конфигурации в массиве.
     let id = UUID()
+    /// Имя пользователя, оставившего отзыв.
+    let userName: NSAttributedString
     /// Текст отзыва.
     let reviewText: NSAttributedString
     /// Максимальное отображаемое количество строк текста. По умолчанию 3.
@@ -30,6 +32,7 @@ extension ReviewCellConfig: TableCellConfig {
     /// Вызывается из `cellForRowAt:` у `dataSource` таблицы.
     func update(cell: UITableViewCell) {
         guard let cell = cell as? ReviewCell else { return }
+        cell.userNameLabel.attributedText = userName
         cell.reviewTextLabel.attributedText = reviewText
         cell.reviewTextLabel.numberOfLines = maxLines
         cell.createdLabel.attributedText = created
@@ -60,6 +63,7 @@ final class ReviewCell: UITableViewCell {
 
     fileprivate var config: Config?
 
+    fileprivate let userNameLabel = UILabel()
     fileprivate let reviewTextLabel = UILabel()
     fileprivate let createdLabel = UILabel()
     fileprivate let showMoreButton = UIButton()
@@ -76,6 +80,7 @@ final class ReviewCell: UITableViewCell {
     override func layoutSubviews() {
         super.layoutSubviews()
         guard let layout = config?.layout else { return }
+        userNameLabel.frame = layout.userNameLabelFrame
         reviewTextLabel.frame = layout.reviewTextLabelFrame
         createdLabel.frame = layout.createdLabelFrame
         showMoreButton.frame = layout.showMoreButtonFrame
@@ -88,9 +93,14 @@ final class ReviewCell: UITableViewCell {
 private extension ReviewCell {
 
     func setupCell() {
+        setupUserNameTextLabel()
         setupReviewTextLabel()
         setupCreatedLabel()
         setupShowMoreButton()
+    }
+    
+    func setupUserNameTextLabel() {
+        contentView.addSubview(userNameLabel)
     }
 
     func setupReviewTextLabel() {
@@ -126,7 +136,8 @@ private final class ReviewCellLayout {
     private static let showMoreButtonSize = Config.showMoreText.size()
 
     // MARK: - Фреймы
-
+    
+    private(set) var userNameLabelFrame = CGRect.zero
     private(set) var reviewTextLabelFrame = CGRect.zero
     private(set) var showMoreButtonFrame = CGRect.zero
     private(set) var createdLabelFrame = CGRect.zero
@@ -161,6 +172,18 @@ private final class ReviewCellLayout {
 
         var maxY = insets.top
         var showShowMoreButton = false
+        
+        if !config.userName.isEmpty() {
+            let currentUserNameTextHeight = (config.userName.font()?.lineHeight ?? .zero) * CGFloat(config.maxLines)
+            let actualUserNameTextHeight = config.userName.boundingRect(width: width).size.height
+            showShowMoreButton = config.maxLines != .zero && actualUserNameTextHeight > currentUserNameTextHeight
+            
+            userNameLabelFrame = CGRect(
+                origin: CGPoint(x: insets.left, y: maxY),
+                size: config.userName.boundingRect(width: width, height: currentUserNameTextHeight).size
+            )
+            maxY = userNameLabelFrame.maxY + usernameToRatingSpacing
+        }
 
         if !config.reviewText.isEmpty() {
             // Высота текста с текущим ограничением по количеству строк.
