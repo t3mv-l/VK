@@ -12,6 +12,8 @@ struct ReviewCellConfig {
     let userName: NSAttributedString
     /// Рейтинг.
     let rating: Int
+    /// Изображения (при их наличии).
+    let photoURLs: [PhotoURL]
     /// Текст отзыва.
     let reviewText: NSAttributedString
     /// Максимальное отображаемое количество строк текста. По умолчанию 3.
@@ -38,9 +40,8 @@ extension ReviewCellConfig: TableCellConfig {
         cell.reviewTextLabel.attributedText = reviewText
         cell.reviewTextLabel.numberOfLines = maxLines
         cell.createdLabel.attributedText = created
-        
         cell.ratingImageView.image = ratingRenderer.ratingImage(rating)
-        
+        cell.updatePhotos(photoURLs: photoURLs)
         cell.config = self
     }
 
@@ -71,6 +72,7 @@ final class ReviewCell: UITableViewCell {
     fileprivate let avatarImageView = UIImageView()
     fileprivate let userNameLabel = UILabel()
     fileprivate let ratingImageView = UIImageView()
+    fileprivate let photosStackView = UIStackView()
     fileprivate let reviewTextLabel = UILabel()
     fileprivate let createdLabel = UILabel()
     fileprivate let showMoreButton = UIButton()
@@ -93,9 +95,33 @@ final class ReviewCell: UITableViewCell {
         
         userNameLabel.frame = layout.userNameLabelFrame
         ratingImageView.frame = layout.ratingImageViewFrame
+        photosStackView.frame = layout.photosStackViewFrame
         reviewTextLabel.frame = layout.reviewTextLabelFrame
         createdLabel.frame = layout.createdLabelFrame
         showMoreButton.frame = layout.showMoreButtonFrame
+        
+        photosStackView.isHidden = photosStackView.frame == .zero
+    }
+    
+    func updatePhotos(photoURLs: [PhotoURL]) {
+        photosStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        for photo in photoURLs {
+            let imageView = UIImageView()
+            imageView.contentMode = .scaleAspectFill
+            imageView.clipsToBounds = true
+            imageView.layer.cornerRadius = 8
+            imageView.widthAnchor.constraint(equalToConstant: 55).isActive = true
+            imageView.heightAnchor.constraint(equalToConstant: 66).isActive = true
+            
+            let activity = UIActivityIndicatorView(style: .medium)
+            activity.hidesWhenStopped = true
+            imageView.addSubview(activity)
+            activity.center = CGPoint(x: 27.5, y: 33)
+            
+            loadImageWithFallback(photo: photo, imageView: imageView, activity: activity)
+            
+            photosStackView.addArrangedSubview(imageView)
+        }
     }
 }
 
@@ -129,6 +155,7 @@ private extension ReviewCell {
         setupAvatarImageView()
         setupUserNameTextLabel()
         setupRatingImageView()
+        setupPhotosStackView()
         setupReviewTextLabel()
         setupCreatedLabel()
         setupShowMoreButton()
@@ -145,6 +172,12 @@ private extension ReviewCell {
     
     func setupRatingImageView() {
         contentView.addSubview(ratingImageView)
+    }
+    
+    func setupPhotosStackView() {
+        contentView.addSubview(photosStackView)
+        photosStackView.axis = .horizontal
+        photosStackView.distribution = .fillEqually
     }
 
     func setupReviewTextLabel() {
@@ -188,6 +221,7 @@ private final class ReviewCellLayout {
     private(set) var avatarImageViewFrame = CGRect.zero
     private(set) var userNameLabelFrame = CGRect.zero
     private(set) var ratingImageViewFrame = CGRect.zero
+    private(set) var photosStackViewFrame = CGRect.zero
     private(set) var reviewTextLabelFrame = CGRect.zero
     private(set) var showMoreButtonFrame = CGRect.zero
     private(set) var createdLabelFrame = CGRect.zero
@@ -247,6 +281,21 @@ private final class ReviewCellLayout {
             size: ratingImageSize
         )
         maxY = ratingImageViewFrame.maxY + ratingToTextSpacing
+        
+        let photos = config.photoURLs
+        let photosCount = photos.count
+        let photoHeight: CGFloat = photosCount > 0 ? 66.0 : 0
+        let photoTopSpacing: CGFloat = photosCount > 0 ? 10.0 : 0
+        
+        if photosCount > 0 {
+            photosStackViewFrame = CGRect(
+                origin: CGPoint(x: contentX, y: maxY + photoTopSpacing),
+                size: CGSize(width: width, height: photoHeight)
+            )
+            maxY = photosStackViewFrame.maxY + photosToTextSpacing
+        } else {
+            photosStackViewFrame = .zero
+        }
 
         if !config.reviewText.isEmpty() {
             let fontLineHeight = config.reviewText.font()?.lineHeight ?? .zero

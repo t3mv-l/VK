@@ -53,6 +53,14 @@
 		21ED1F642D69D0340012D6F6 /* ReviewsScreenFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewsScreenFactory.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		AC8767082E0EB2EB0018F517 /* Images */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Images;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
 /* Begin PBXFrameworksBuildPhase section */
 		21B82DF62D4792300085DAA2 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
@@ -157,6 +165,7 @@
 				21B82E352D47B0D80085DAA2 /* ReviewsProvider.swift */,
 				21667B7F2D4A25B2009AAA76 /* RatingRenderer.swift */,
 				216668752D48F39E009AAA76 /* Cells */,
+				AC8767082E0EB2EB0018F517 /* Images */,
 			);
 			path = Reviews;
 			sourceTree = "<group>";
@@ -201,6 +210,9 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				AC8767082E0EB2EB0018F517 /* Images */,
 			);
 			name = Test;
 			packageProductDependencies = (

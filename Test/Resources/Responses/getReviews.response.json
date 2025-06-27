@@ -5,6 +5,7 @@
             "first_name": "Иван",
             "last_name": "Петров",
             "rating": 5,
+            "photo_urls": [],
             "text": "Кроссовки хорошие. Удобные. Как по мне сшиты.",
             "created": "1 час назад"
         },
@@ -12,6 +13,24 @@
             "first_name": "Екатерина",
             "last_name": "Иванова",
             "rating": 3,
+            "photo_urls": [
+                {
+                    "google": "https://drive.google.com/file/d/18v4XaIHQ1FTLulxP4cBm8m0KOCftvfE5/view",
+                    "yandex": "https://disk.yandex.ru/i/O_qrxK3v34vTxA"
+                },
+                {
+                    "google": "https://drive.google.com/file/d/1xFd6y1nOd65-MsVtB-dRBWYVfdEgwmiE/view",
+                    "yandex": "https://disk.yandex.ru/i/koaMAtcHXJWCSw"
+                },
+                {
+                    "google": "https://drive.google.com/file/d/1n8zNks4NnMCZGcPa3u7lTnzMQAJAJ_SR/view",
+                    "yandex": "https://disk.yandex.ru/i/2hholUFsbr9l0g"
+                },
+                {
+                    "google": "https://drive.google.com/file/d/1idDhOY4Ai_ioRpX6HoNKbVx5aoID5sDg/view",
+                    "yandex": "https://disk.yandex.ru/i/rVZXnr7GnEAH8A"
+                }
+            ],
             "text": "Скользские ужасно.",
             "created": "12 минут назад"
         },
@@ -19,6 +38,7 @@
             "first_name": "Евгения",
             "last_name": "Петрова",
             "rating": 4,
+            "photo_urls": [],
             "text": "Прошла по снегу 30 метров, 5 раз упала. Спасибо мужу, поддерживал. Возврат, к сожалению.",
             "created": "35 минут назад"
         },
@@ -26,6 +46,12 @@
             "first_name": "Илья",
             "last_name": "Петров",
             "rating": 2,
+            "photo_urls": [
+                {
+                    "google": "https://drive.google.com/file/d/1wdBz1Dsw_nLOhsRrrM95TRydPC-LGgsh/view",
+                    "yandex": "https://disk.yandex.ru/i/lVLuSN45XRgfQA"
+                }
+            ],
             "text": "Понравилось отношение - несмотря на то, что заказ был выполнен не идеально, продавец был очень любезен и шёл... Прошла по снегу 30 метров, 5 раз упала. Спасибо мужу, поддерживал. Возврат, к сожалению.",
             "created": "минуту назад"
         },
@@ -33,6 +59,7 @@
             "first_name": "Никита",
             "last_name": "Иванов",
             "rating": 5,
+            "photo_urls": [],
             "text": "Отлично выглядят, хоть и скользковатые...",
             "created": "только что"
         },
@@ -40,6 +67,7 @@
             "first_name": "Олег",
             "last_name": "Николаев",
             "rating": 1,
+            "photo_urls": [],
             "text": "Ребёнок жалуется, что очень скользские. Пока шла до школы...",
             "created": "15 минут назад"
         },
@@ -47,6 +75,20 @@
             "first_name": "Николай",
             "last_name": "Петров",
             "rating": 2,
+            "photo_urls": [
+                {
+                    "google": "https://drive.google.com/file/d/1wdBz1Dsw_nLOhsRrrM95TRydPC-LGgsh/view",
+                    "yandex": "https://disk.yandex.ru/i/lVLuSN45XRgfQA"
+                },
+                {
+                    "google": "https://drive.google.com/file/d/1S4s9R2XOQ-91uVDfe5tN5luwjOiWosMg/view",
+                    "yandex": "https://disk.yandex.ru/i/KAxKszZPOupcHQ"
+                },
+                {
+                    "google": "https://drive.google.com/file/d/1n8zNks4NnMCZGcPa3u7lTnzMQAJAJ_SR/view",
+                    "yandex": "https://disk.yandex.ru/i/2hholUFsbr9l0g"
+                }
+            ],
             "text": "",
             "created": "вчера в 12:39"
         },
@@ -56,6 +98,7 @@
             "first_name": "Иван",
             "last_name": "Петров",
             "rating": 5,
+            "photo_urls": [],
             "text": "Кроссовки хорошие. Удобные. Как по мне сшиты.",
             "created": "1 час назад"
         },
@@ -63,6 +106,24 @@
             "first_name": "Екатерина",
             "last_name": "Иванова",
             "rating": 3,
+            "photo_urls": [
+                {
+                    "google": "https://drive.google.com/file/d/18v4XaIHQ1FTLulxP4cBm8m0KOCftvfE5/view",
+                    "yandex": "https://disk.yandex.ru/i/O_qrxK3v34vTxA"
+                },
+                {
+                    "google": "https://drive.google.com/file/d/1xFd6y1nOd65-MsVtB-dRBWYVfdEgwmiE/view",
+                    "yandex": "https://disk.yandex.ru/i/koaMAtcHXJWCSw"
+                },
+                {
+                    "google": "https://drive.google.com/file/d/1n8zNks4NnMCZGcPa3u7lTnzMQAJAJ_SR/view",
+                    "yandex": "https://disk.yandex.ru/i/2hholUFsbr9l0g"
+                },
+                {
+                    "google": "https://drive.google.com/file/d/1idDhOY4Ai_ioRpX6HoNKbVx5aoID5sDg/view",
+                    "yandex": "https://disk.yandex.ru/i/rVZXnr7GnEAH8A"
+                }
+            ],
             "text": "Скользские ужасно.",
             "created": "12 минут назад"
         },
@@ -70,6 +131,7 @@
             "first_name": "Евгения",
             "last_name": "Петрова",
             "rating": 4,
+            "photo_urls": [],
             "text": "Прошла по снегу 30 метров, 5 раз упала. Спасибо мужу, поддерживал. Возврат, к сожалению.",
             "created": "35 минут назад"
         },
@@ -77,6 +139,12 @@
             "first_name": "Илья",
             "last_name": "Петров",
             "rating": 2,
+            "photo_urls": [
+                {
+                    "google": "https://drive.google.com/file/d/1wdBz1Dsw_nLOhsRrrM95TRydPC-LGgsh/view",
+                    "yandex": "https://disk.yandex.ru/i/lVLuSN45XRgfQA"
+                }
+            ],
             "text": "Понравилось отношение - несмотря на то, что заказ был выполнен не идеально, продавец был очень любезен и шёл... Прошла по снегу 30 метров, 5 раз упала. Спасибо мужу, поддерживал. Возврат, к сожалению.",
             "created": "минуту назад"
         },
@@ -84,6 +152,7 @@
             "first_name": "Никита",
             "last_name": "Иванов",
             "rating": 5,
+            "photo_urls": [],
             "text": "Отлично выглядят, хоть и скользковатые...",
             "created": "только что"
         },
@@ -91,6 +160,7 @@
             "first_name": "Олег",
             "last_name": "Николаев",
             "rating": 1,
+            "photo_urls": [],
             "text": "Ребёнок жалуется, что очень скользские. Пока шла до школы...",
             "created": "15 минут назад"
         },
@@ -98,6 +168,20 @@
             "first_name": "Николай",
             "last_name": "Петров",
             "rating": 2,
+            "photo_urls": [
+                {
+                    "google": "https://drive.google.com/file/d/1wdBz1Dsw_nLOhsRrrM95TRydPC-LGgsh/view",
+                    "yandex": "https://disk.yandex.ru/i/lVLuSN45XRgfQA"
+                },
+                {
+                    "google": "https://drive.google.com/file/d/1S4s9R2XOQ-91uVDfe5tN5luwjOiWosMg/view",
+                    "yandex": "https://disk.yandex.ru/i/KAxKszZPOupcHQ"
+                },
+                {
+                    "google": "https://drive.google.com/file/d/1n8zNks4NnMCZGcPa3u7lTnzMQAJAJ_SR/view",
+                    "yandex": "https://disk.yandex.ru/i/2hholUFsbr9l0g"
+                }
+            ],
             "text": "",
             "created": "вчера в 12:39"
         },
@@ -107,6 +191,7 @@
             "first_name": "Иван",
             "last_name": "Петров",
             "rating": 5,
+            "photo_urls": [],
             "text": "Кроссовки хорошие. Удобные. Как по мне сшиты.",
             "created": "1 час назад"
         },
@@ -114,6 +199,24 @@
             "first_name": "Екатерина",
             "last_name": "Иванова",
             "rating": 3,
+            "photo_urls": [
+                {
+                    "google": "https://drive.google.com/file/d/18v4XaIHQ1FTLulxP4cBm8m0KOCftvfE5/view",
+                    "yandex": "https://disk.yandex.ru/i/O_qrxK3v34vTxA"
+                },
+                {
+                    "google": "https://drive.google.com/file/d/1xFd6y1nOd65-MsVtB-dRBWYVfdEgwmiE/view",
+                    "yandex": "https://disk.yandex.ru/i/koaMAtcHXJWCSw"
+                },
+                {
+                    "google": "https://drive.google.com/file/d/1n8zNks4NnMCZGcPa3u7lTnzMQAJAJ_SR/view",
+                    "yandex": "https://disk.yandex.ru/i/2hholUFsbr9l0g"
+                },
+                {
+                    "google": "https://drive.google.com/file/d/1idDhOY4Ai_ioRpX6HoNKbVx5aoID5sDg/view",
+                    "yandex": "https://disk.yandex.ru/i/rVZXnr7GnEAH8A"
+                }
+            ],
             "text": "Скользские ужасно.",
             "created": "12 минут назад"
         },
@@ -121,6 +224,7 @@
             "first_name": "Евгения",
             "last_name": "Петрова",
             "rating": 4,
+            "photo_urls": [],
             "text": "Прошла по снегу 30 метров, 5 раз упала. Спасибо мужу, поддерживал. Возврат, к сожалению.",
             "created": "35 минут назад"
         },
@@ -128,6 +232,12 @@
             "first_name": "Илья",
             "last_name": "Петров",
             "rating": 2,
+            "photo_urls": [
+                {
+                    "google": "https://drive.google.com/file/d/1wdBz1Dsw_nLOhsRrrM95TRydPC-LGgsh/view",
+                    "yandex": "https://disk.yandex.ru/i/lVLuSN45XRgfQA"
+                }
+            ],
             "text": "Понравилось отношение - несмотря на то, что заказ был выполнен не идеально, продавец был очень любезен и шёл... Прошла по снегу 30 метров, 5 раз упала. Спасибо мужу, поддерживал. Возврат, к сожалению.",
             "created": "минуту назад"
         },
@@ -135,6 +245,7 @@
             "first_name": "Никита",
             "last_name": "Иванов",
             "rating": 5,
+            "photo_urls": [],
             "text": "Отлично выглядят, хоть и скользковатые...",
             "created": "только что"
         },
@@ -142,6 +253,7 @@
             "first_name": "Олег",
             "last_name": "Николаев",
             "rating": 1,
+            "photo_urls": [],
             "text": "Ребёнок жалуется, что очень скользские. Пока шла до школы...",
             "created": "15 минут назад"
         },
@@ -149,6 +261,20 @@
             "first_name": "Николай",
             "last_name": "Петров",
             "rating": 2,
+            "photo_urls": [
+                {
+                    "google": "https://drive.google.com/file/d/1wdBz1Dsw_nLOhsRrrM95TRydPC-LGgsh/view",
+                    "yandex": "https://disk.yandex.ru/i/lVLuSN45XRgfQA"
+                },
+                {
+                    "google": "https://drive.google.com/file/d/1S4s9R2XOQ-91uVDfe5tN5luwjOiWosMg/view",
+                    "yandex": "https://disk.yandex.ru/i/KAxKszZPOupcHQ"
+                },
+                {
+                    "google": "https://drive.google.com/file/d/1n8zNks4NnMCZGcPa3u7lTnzMQAJAJ_SR/view",
+                    "yandex": "https://disk.yandex.ru/i/2hholUFsbr9l0g"
+                }
+            ],
             "text": "",
             "created": "вчера в 12:39"
         },

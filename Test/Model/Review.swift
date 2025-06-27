@@ -6,6 +6,8 @@ struct Review: Decodable {
     let last_name: String
     /// Количество звёзд
     let rating: Int
+    /// Загружаемые изображения.
+    let photo_urls: [PhotoURL]?
     /// Текст отзыва.
     let text: String
     /// Время создания отзыва.
@@ -16,4 +18,9 @@ struct Review: Decodable {
         return "\(first_name) \(last_name)"
     }
     
+}
+
+struct PhotoURL: Decodable {
+    let google: String
+    let yandex: String
 }
