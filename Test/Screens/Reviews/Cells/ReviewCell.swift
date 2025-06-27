@@ -76,6 +76,9 @@ final class ReviewCell: UITableViewCell {
     fileprivate let reviewTextLabel = UILabel()
     fileprivate let createdLabel = UILabel()
     fileprivate let showMoreButton = UIButton()
+    
+    /// Свойство для сравнения, загружались ли фото по указанным URL ранее
+    private var lastPhotoURLs: [String] = []
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -111,6 +114,10 @@ final class ReviewCell: UITableViewCell {
         // половина одного изображения по высоте
         let activityY: CGFloat = 33.0
         
+        let urls = photoURLs.map { $0.google }
+        guard urls != lastPhotoURLs else { return }
+        lastPhotoURLs = urls
+        
         photosStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
         for photo in photoURLs {
             let imageView = UIImageView()
@@ -127,6 +134,12 @@ final class ReviewCell: UITableViewCell {
             
             photosStackView.addArrangedSubview(imageView)
         }
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        lastPhotoURLs = []
+        photosStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
     }
 }
 
