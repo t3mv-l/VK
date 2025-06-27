@@ -283,13 +283,13 @@ private final class ReviewCellLayout {
         
         let photos = config.photoURLs
         let photosCount = photos.count
-        //let photoHeight: CGFloat = photosCount > 0 ? Self.photoSize.height : 0
-        let photoTopSpacing: CGFloat = photosCount > 0 ? 10.0 : 0
+        let photoTopSpacing: CGFloat = photosCount > 0 ? ratingToPhotosSpacing : 0
         
         if photosCount > 0 {
+            let totalWidth = CGFloat(photosCount) * Self.photoSize.width + CGFloat(photosCount - 1) * photosSpacing
             photosStackViewFrame = CGRect(
                 origin: CGPoint(x: contentX, y: maxY + photoTopSpacing),
-                size: CGSize(width: width, height: Self.photoSize.height)
+                size: CGSize(width: totalWidth, height: Self.photoSize.height)
             )
             maxY = photosStackViewFrame.maxY + photosToTextSpacing
         } else {
