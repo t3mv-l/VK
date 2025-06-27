@@ -110,8 +110,6 @@ final class ReviewCell: UITableViewCell {
             imageView.contentMode = .scaleAspectFill
             imageView.clipsToBounds = true
             imageView.layer.cornerRadius = 8
-            imageView.widthAnchor.constraint(equalToConstant: 55).isActive = true
-            imageView.heightAnchor.constraint(equalToConstant: 66).isActive = true
             
             let activity = UIActivityIndicatorView(style: .medium)
             activity.hidesWhenStopped = true
@@ -178,6 +176,7 @@ private extension ReviewCell {
         contentView.addSubview(photosStackView)
         photosStackView.axis = .horizontal
         photosStackView.distribution = .fillEqually
+        photosStackView.spacing = 10
     }
 
     func setupReviewTextLabel() {
@@ -284,13 +283,13 @@ private final class ReviewCellLayout {
         
         let photos = config.photoURLs
         let photosCount = photos.count
-        let photoHeight: CGFloat = photosCount > 0 ? 66.0 : 0
+        //let photoHeight: CGFloat = photosCount > 0 ? Self.photoSize.height : 0
         let photoTopSpacing: CGFloat = photosCount > 0 ? 10.0 : 0
         
         if photosCount > 0 {
             photosStackViewFrame = CGRect(
                 origin: CGPoint(x: contentX, y: maxY + photoTopSpacing),
-                size: CGSize(width: width, height: photoHeight)
+                size: CGSize(width: width, height: Self.photoSize.height)
             )
             maxY = photosStackViewFrame.maxY + photosToTextSpacing
         } else {
