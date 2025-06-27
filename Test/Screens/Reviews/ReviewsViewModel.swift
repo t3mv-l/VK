@@ -4,7 +4,7 @@ import UIKit
 final class ReviewsViewModel: NSObject {
 
     /// Замыкание, вызываемое при изменении `state`.
-    var onStateChange: ((State) -> Void)?
+    var onStateChange: ((State, [Int]?, Bool) -> Void)?
 
     private var state: State
     private let reviewsProvider: ReviewsProvider
@@ -49,13 +49,18 @@ private extension ReviewsViewModel {
         do {
             let data = try result.get()
             let reviews = try decoder.decode(Reviews.self, from: data)
-            state.items += reviews.items.map(makeReviewItem)
+            let newItems = reviews.items.map(makeReviewItem)
+            let startIndex = state.items.count
+            state.items += newItems
             state.offset += state.limit
             state.shouldLoad = state.offset < reviews.count
+            
+            let newIndexes = (startIndex..<(startIndex + newItems.count)).map { $0 }
+            onStateChange?(state, newIndexes, true)
         } catch {
             state.shouldLoad = true
+            onStateChange?(state, nil, false)
         }
-        onStateChange?(state)
     }
 
     /// Метод, вызываемый при нажатии на кнопку "Показать полностью...".
@@ -67,7 +72,7 @@ private extension ReviewsViewModel {
         else { return }
         item.maxLines = .zero
         state.items[index] = item
-        onStateChange?(state)
+        onStateChange?(state, [index], false)
     }
 
 }

@@ -40,7 +40,7 @@ extension ReviewCellConfig: TableCellConfig {
         cell.reviewTextLabel.attributedText = reviewText
         cell.reviewTextLabel.numberOfLines = maxLines
         cell.createdLabel.attributedText = created
-        cell.ratingImageView.image = ratingRenderer.ratingImage(rating)
+        cell.ratingImageView.image = cachedRatingImage(for: rating, renderer: ratingRenderer)
         cell.updatePhotos(photoURLs: photoURLs)
         cell.config = self
     }
@@ -104,17 +104,24 @@ final class ReviewCell: UITableViewCell {
     }
     
     func updatePhotos(photoURLs: [PhotoURL]) {
+        // закругление изображений
+        let imageViewCornerRadius: CGFloat = 8.0
+        // половина одного изображения по ширине
+        let activityX: CGFloat = 27.5
+        // половина одного изображения по высоте
+        let activityY: CGFloat = 33.0
+        
         photosStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
         for photo in photoURLs {
             let imageView = UIImageView()
-            imageView.contentMode = .scaleAspectFill
+            imageView.contentMode = .scaleToFill
             imageView.clipsToBounds = true
-            imageView.layer.cornerRadius = 8
+            imageView.layer.cornerRadius = imageViewCornerRadius
             
             let activity = UIActivityIndicatorView(style: .medium)
             activity.hidesWhenStopped = true
             imageView.addSubview(activity)
-            activity.center = CGPoint(x: 27.5, y: 33)
+            activity.center = CGPoint(x: activityX, y: activityY)
             
             loadImageWithFallback(photo: photo, imageView: imageView, activity: activity)
             
@@ -161,7 +168,7 @@ private extension ReviewCell {
     
     func setupAvatarImageView() {
         contentView.addSubview(avatarImageView)
-        avatarImageView.image = UIImage(named: "avatar")
+        loadAvatar(named: "avatar", into: avatarImageView)
     }
     
     func setupUserNameTextLabel() {
@@ -176,7 +183,7 @@ private extension ReviewCell {
         contentView.addSubview(photosStackView)
         photosStackView.axis = .horizontal
         photosStackView.distribution = .fillEqually
-        photosStackView.spacing = 10
+        photosStackView.spacing = ReviewCellLayout.spacingBetweenPhotos
     }
 
     func setupReviewTextLabel() {
@@ -211,6 +218,7 @@ private final class ReviewCellLayout {
     fileprivate static let avatarSize = CGSize(width: 36.0, height: 36.0)
     fileprivate static let avatarCornerRadius = 18.0
     fileprivate static let photoCornerRadius = 8.0
+    fileprivate static let spacingBetweenPhotos: CGFloat = 10.0
 
     private static let photoSize = CGSize(width: 55.0, height: 66.0)
     private static let showMoreButtonSize = Config.showMoreText.size()
