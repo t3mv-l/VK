@@ -94,7 +94,9 @@ private extension ReviewsViewModel {
         else { return }
         item.maxLines = .zero
         state.items[index] = item
-        onStateChange?(state, [index], false)
+        UIView.performWithoutAnimation {
+            onStateChange?(state, [index], false)
+        }
     }
 
 }
