@@ -35,12 +35,16 @@ private extension ReviewsViewController {
         let reviewsView = ReviewsView()
         reviewsView.tableView.delegate = viewModel
         reviewsView.tableView.dataSource = viewModel
+        reviewsView.refreshControl.addTarget(self, action: #selector(refreshData), for: .valueChanged)
         return reviewsView
     }
 
     func setupViewModel() {
         viewModel.onStateChange = { [weak reviewsView] state, changedIndexes, isInsert in
             guard let reviewsView = reviewsView else { return }
+            
+            reviewsView.refreshControl.endRefreshing()
+            
             if let changed = changedIndexes {
                 if isInsert {
                     reviewsView.tableView.insertRows(at: changed.map { IndexPath(row: $0, section: 0) }, with: .automatic)
@@ -52,5 +56,8 @@ private extension ReviewsViewController {
             }
         }
     }
-
+    
+    @objc private func refreshData() {
+        viewModel.refreshReviews()
+    }
 }

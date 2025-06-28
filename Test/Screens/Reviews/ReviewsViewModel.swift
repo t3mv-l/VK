@@ -37,6 +37,13 @@ extension ReviewsViewModel {
         state.shouldLoad = false
         reviewsProvider.getReviews(offset: state.offset, completion: gotReviews)
     }
+    
+    /// Метод обновления отзывов.
+    func refreshReviews() {
+        state = State()
+        state.isRefresh = true
+        reviewsProvider.getReviews(offset: state.offset, completion: gotReviews)
+    }
 
 }
 
@@ -50,15 +57,30 @@ private extension ReviewsViewModel {
             let data = try result.get()
             let reviews = try decoder.decode(Reviews.self, from: data)
             let newItems = reviews.items.map(makeReviewItem)
-            let startIndex = state.items.count
-            state.items += newItems
-            state.offset += state.limit
-            state.shouldLoad = state.offset < reviews.count
             
-            let newIndexes = (startIndex..<(startIndex + newItems.count)).map { $0 }
-            onStateChange?(state, newIndexes, true)
+            if state.isRefresh {
+                // При полном обновлении заменяем все элементы
+                state.items = newItems
+                state.isRefresh = false
+                state.offset = state.limit
+                state.shouldLoad = state.offset < reviews.count
+                
+                // Полная перезагрузка таблицы
+                onStateChange?(state, nil, false)
+            } else {
+                // При обычной загрузке добавляем новые элементы
+                let startIndex = state.items.count
+                state.items += newItems
+                state.offset += state.limit
+                state.shouldLoad = state.offset < reviews.count
+                
+                let newIndexes = (startIndex..<(startIndex + newItems.count)).map { $0 }
+                // Добавление новых строк
+                onStateChange?(state, newIndexes, true)
+            }
         } catch {
             state.shouldLoad = true
+            state.isRefresh = false
             onStateChange?(state, nil, false)
         }
     }
