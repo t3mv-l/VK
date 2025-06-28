@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import ImageIO
 
 class ImageCache {
     static let shared = NSCache<NSString, UIImage>()
@@ -13,7 +14,22 @@ class ImageCache {
     static let ratingCache = NSCache<NSNumber, UIImage>()
 }
 
-func loadImage(urlString: String, into imageView: UIImageView, activity: UIActivityIndicatorView) {
+// Даунсэмплинг изображения, т.е. уменьшение его размеров до уже заданных значений перед отображением
+func downsample(data: Data, to pointSize: CGSize, scale: CGFloat = UIScreen.main.scale) -> UIImage? {
+    let options = [kCGImageSourceShouldCache: false] as CFDictionary
+    guard let source = CGImageSourceCreateWithData(data as CFData, options) else { return nil }
+    let maxDimension = max(pointSize.width, pointSize.height) * scale
+    let downsampleOptions = [
+        kCGImageSourceCreateThumbnailFromImageAlways: true,
+        kCGImageSourceShouldCacheImmediately: true,
+        kCGImageSourceCreateThumbnailWithTransform: true,
+        kCGImageSourceThumbnailMaxPixelSize: maxDimension
+    ] as CFDictionary
+    guard let cgImage = CGImageSourceCreateThumbnailAtIndex(source, 0, downsampleOptions) else { return nil }
+    return UIImage(cgImage: cgImage)
+}
+
+func loadImage(urlString: String, into imageView: UIImageView, activity: UIActivityIndicatorView, targetSize: CGSize = CGSize(width: 55, height: 66)) {
     guard let url = URL(string: urlString), !urlString.isEmpty else {
         imageView.image = nil
         activity.stopAnimating()
@@ -28,7 +44,7 @@ func loadImage(urlString: String, into imageView: UIImageView, activity: UIActiv
     URLSession.shared.dataTask(with: url) { data, _, _ in
         DispatchQueue.main.async {
             activity.stopAnimating()
-            if let data = data, let image = UIImage(data: data) {
+            if let data = data, let image = downsample(data: data, to: targetSize) {
                 ImageCache.shared.setObject(image, forKey: urlString as NSString)
                 imageView.image = image
             }
@@ -58,6 +74,7 @@ func cachedRatingImage(for rating: Int, renderer: RatingRenderer) -> UIImage {
     return image
 }
 
-func loadImageWithFallback(photo: PhotoURL, imageView: UIImageView, activity: UIActivityIndicatorView) {
-    loadImage(urlString: photo.google, into: imageView, activity: activity)
+func loadImageWithFallback(photo: PhotoURL, imageView: UIImageView, activity: UIActivityIndicatorView, targetSize: CGSize = CGSize(width: 55, height: 66)) {
+    // Можно добавить fallback на другой url, если нужно
+    loadImage(urlString: photo.google, into: imageView, activity: activity, targetSize: targetSize)
 }

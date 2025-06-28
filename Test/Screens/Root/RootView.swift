@@ -27,7 +27,6 @@ final class RootView: UIView {
 private extension RootView {
 
     func setupView() {
-        backgroundColor = .systemBackground
         backgroundView.image = UIImage(named: "rootViewBackground")
         backgroundView.translatesAutoresizingMaskIntoConstraints = false
         insertSubview(backgroundView, at: 0)

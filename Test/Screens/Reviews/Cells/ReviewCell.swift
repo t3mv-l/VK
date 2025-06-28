@@ -119,6 +119,7 @@ final class ReviewCell: UITableViewCell {
         lastPhotoURLs = urls
         
         photosStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        let photoSize = CGSize(width: 55, height: 66)
         for photo in photoURLs {
             let imageView = UIImageView()
             imageView.contentMode = .scaleToFill
@@ -130,7 +131,7 @@ final class ReviewCell: UITableViewCell {
             imageView.addSubview(activity)
             activity.center = CGPoint(x: activityX, y: activityY)
             
-            loadImageWithFallback(photo: photo, imageView: imageView, activity: activity)
+            loadImageWithFallback(photo: photo, imageView: imageView, activity: activity, targetSize: photoSize)
             
             photosStackView.addArrangedSubview(imageView)
         }

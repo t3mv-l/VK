@@ -134,15 +134,15 @@ extension ReviewsViewModel: UITableViewDataSource {
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if indexPath.row == state.items.count {
-            let cell = tableView.dequeueReusableCell(withIdentifier: "ReviewsCountCell", for: indexPath) as! ReviewsCountCell
-            cell.countLabel.text = "\(state.items.count) отзывов"
-            cell.selectionStyle = .none
-            return cell
-        } else {
+        if indexPath.row < state.items.count {
             let config = state.items[indexPath.row]
             let cell = tableView.dequeueReusableCell(withIdentifier: config.reuseId, for: indexPath)
             config.update(cell: cell, ratingRenderer: ratingRenderer)
+            return cell
+        } else {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "ReviewsCountCell", for: indexPath) as! ReviewsCountCell
+            cell.countLabel.text = "\(state.items.count) отзывов"
+            cell.selectionStyle = .none
             return cell
         }
     }
@@ -155,10 +155,10 @@ extension ReviewsViewModel: UITableViewDelegate {
     private static let lastCellHeight: CGFloat = 50
 
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        if indexPath.row == state.items.count {
-            Self.lastCellHeight
-        } else {
+        if indexPath.row < state.items.count {
             state.items[indexPath.row].height(with: tableView.bounds.size)
+        } else {
+            Self.lastCellHeight
         }
     }
 
