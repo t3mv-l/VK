@@ -22,6 +22,10 @@ final class ReviewsViewModel: NSObject {
         self.ratingRenderer = ratingRenderer
         self.decoder = decoder
     }
+    
+    deinit {
+        print("ReviewsViewModel deinited")
+    }
 
 }
 
@@ -118,7 +122,10 @@ private extension ReviewsViewModel {
             photoURLs: photoURLs,
             reviewText: reviewText,
             created: created,
-            onTapShowMore: showMoreReview
+            // weak self устраняет утечки при нажатии кнопки "Назад" и повторном открытии отзывов
+            onTapShowMore: { [weak self] id in
+                self?.showMoreReview(with: id)
+            }
         )
         return item
     }

@@ -24,6 +24,10 @@ final class ReviewsViewController: UIViewController {
         setupViewModel()
         viewModel.getReviews()
     }
+    
+    deinit {
+        print("ReviewsViewController deinited")
+    }
 
 }
 
