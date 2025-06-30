@@ -36,10 +36,24 @@ private extension ReviewsView {
         tableView.separatorStyle = .none
         tableView.allowsSelection = false
         tableView.register(ReviewCell.self, forCellReuseIdentifier: ReviewCellConfig.reuseId)
-        tableView.register(ReviewsCountCell.self, forCellReuseIdentifier: "ReviewsCountCell")
     }
     
     func setupRefreshControl() {
         tableView.refreshControl = refreshControl
+    }
+}
+
+extension ReviewsView {
+    // static - чтобы не было ошибки "Extensions must not contain stored properties"
+    private static let countLabelHeight: CGFloat = 44
+    
+    func updateFooter(count: Int) {
+        let countLabel = UILabel()
+        countLabel.textAlignment = .center
+        countLabel.font = UIFont.reviewCount
+        countLabel.textColor = UIColor.secondaryLabel
+        countLabel.text = "\(count) отзывов"
+        countLabel.frame = CGRect(x: 0, y: 0, width: tableView.bounds.width, height: Self.countLabelHeight)
+        tableView.tableFooterView = countLabel
     }
 }

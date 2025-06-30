@@ -58,6 +58,7 @@ private extension ReviewsViewController {
             } else {
                 reviewsView.tableView.reloadData()
             }
+            reviewsView.updateFooter(count: state.items.count)
         }
     }
     
