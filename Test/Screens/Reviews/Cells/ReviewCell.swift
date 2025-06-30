@@ -2,12 +2,6 @@ import UIKit
 
 /// Конфигурация ячейки. Содержит данные для отображения в ячейке.
 struct ReviewCellConfig {
-
-    /// Идентификатор для переиспользования ячейки.
-    static let reuseId = String(describing: ReviewCellConfig.self)
-
-    /// Идентификатор конфигурации. Можно использовать для поиска конфигурации в массиве.
-    let id = UUID()
     /// Имя пользователя, оставившего отзыв.
     let userName: NSAttributedString
     /// Рейтинг.
@@ -22,10 +16,33 @@ struct ReviewCellConfig {
     let created: NSAttributedString
     /// Замыкание, вызываемое при нажатии на кнопку "Показать полностью...".
     let onTapShowMore: (UUID) -> Void
-
     /// Объект, хранящий посчитанные фреймы для ячейки отзыва.
     fileprivate let layout = ReviewCellLayout()
+    /// Идентификатор конфигурации. Можно использовать для поиска конфигурации в массиве.
+    let id = UUID()
+    
+    var layoutKey: LayoutKey {
+        LayoutKey(
+            userName: userName.string,
+            rating: rating,
+            photoURLs: photoURLs,
+            reviewText: reviewText.string,
+            maxLines: maxLines,
+            created: created.string
+        )
+    }
+    
+    struct LayoutKey: Hashable {
+        let userName: String
+        let rating: Int
+        let photoURLs: [PhotoURL]
+        let reviewText: String
+        let maxLines: Int
+        let created: String
+    }
 
+    /// Идентификатор для переиспользования ячейки.
+    static let reuseId = String(describing: ReviewCellConfig.self)
 }
 
 // MARK: - TableCellConfig
@@ -48,7 +65,7 @@ extension ReviewCellConfig: TableCellConfig {
     /// Метод, возвращаюший высоту ячейки с данным ограничением по размеру.
     /// Вызывается из `heightForRowAt:` делегата таблицы.
     func height(with size: CGSize) -> CGFloat {
-        layout.height(config: self, maxWidth: size.width)
+        Layout.heightFor(config: self, maxWidth: size.width)
     }
 
 }
@@ -92,8 +109,11 @@ final class ReviewCell: UITableViewCell {
     override func layoutSubviews() {
         super.layoutSubviews()
         guard let layout = config?.layout else { return }
+        
+        _ = layout.calculate(config: config!, maxWidth: bounds.width)
+        
         avatarImageView.frame = layout.avatarImageViewFrame
-        avatarImageView.layer.cornerRadius = ReviewCellLayout.avatarCornerRadius
+        avatarImageView.layer.cornerRadius = Layout.avatarCornerRadius
         avatarImageView.clipsToBounds = true
         
         userNameLabel.frame = layout.userNameLabelFrame
@@ -197,7 +217,7 @@ private extension ReviewCell {
         contentView.addSubview(photosStackView)
         photosStackView.axis = .horizontal
         photosStackView.distribution = .fillEqually
-        photosStackView.spacing = ReviewCellLayout.spacingBetweenPhotos
+        photosStackView.spacing = Layout.spacingBetweenPhotos
     }
 
     func setupReviewTextLabel() {
@@ -226,6 +246,12 @@ private extension ReviewCell {
 /// Класс, в котором происходит расчёт фреймов для сабвью ячейки отзыва.
 /// После расчётов возвращается актуальная высота ячейки.
 private final class ReviewCellLayout {
+    
+    private static var heightCache = [CacheKey: CGFloat]()
+    private struct CacheKey: Hashable {
+        let layoutKey: Config.LayoutKey
+        let maxWidth: CGFloat
+    }
 
     // MARK: - Размеры
 
@@ -250,46 +276,98 @@ private final class ReviewCellLayout {
     // MARK: - Отступы
 
     /// Отступы от краёв ячейки до её содержимого.
-    private let insets = UIEdgeInsets(top: 9.0, left: 12.0, bottom: 9.0, right: 12.0)
-
+    private static let insets = UIEdgeInsets(top: 9.0, left: 12.0, bottom: 9.0, right: 12.0)
     /// Горизонтальный отступ от аватара до имени пользователя.
-    private let avatarToUsernameSpacing = 10.0
+    private static let avatarToUsernameSpacing = 10.0
     /// Вертикальный отступ от имени пользователя до вью рейтинга.
-    private let usernameToRatingSpacing = 6.0
+    private static let usernameToRatingSpacing = 6.0
     /// Вертикальный отступ от вью рейтинга до текста (если нет фото).
-    private let ratingToTextSpacing = 6.0
+    private static let ratingToTextSpacing = 6.0
     /// Вертикальный отступ от вью рейтинга до фото.
-    private let ratingToPhotosSpacing = 10.0
+    private static let ratingToPhotosSpacing = 10.0
     /// Горизонтальные отступы между фото.
-    private let photosSpacing = 8.0
+    private static let photosSpacing = 8.0
     /// Вертикальный отступ от фото (если они есть) до текста отзыва.
-    private let photosToTextSpacing = 10.0
+    private static let photosToTextSpacing = 10.0
     /// Вертикальный отступ от текста отзыва до времени создания отзыва или кнопки "Показать полностью..." (если она есть).
-    private let reviewTextToCreatedSpacing = 6.0
+    private static let reviewTextToCreatedSpacing = 6.0
     /// Вертикальный отступ от кнопки "Показать полностью..." до времени создания отзыва.
-    private let showMoreToCreatedSpacing = 6.0
-
+    private static let showMoreToCreatedSpacing = 6.0
+    
     // MARK: - Расчёт фреймов и высоты ячейки
-
-    /// Возвращает высоту ячейку с данной конфигурацией `config` и ограничением по ширине `maxWidth`.
-    func height(config: Config, maxWidth: CGFloat) -> CGFloat {
-        let contentX = avatarImageViewFrame.maxY + avatarToUsernameSpacing
+    
+    /// Возвращает высоту ячейки с данной конфигурацией `config` и ограничением по ширине `maxWidth`.
+    static func heightFor(config: Config, maxWidth: CGFloat) -> CGFloat {
+        let key = CacheKey(layoutKey: config.layoutKey, maxWidth: maxWidth)
+        if let cached = heightCache[key] {
+            return cached
+        }
+        
+        let contentX = insets.left + self.avatarSize.width + avatarToUsernameSpacing
         let width = maxWidth - contentX - insets.right
-
+        
         var maxY = insets.top
+        
+        maxY += config.userName.boundingRect(width: width).size.height
+        maxY += usernameToRatingSpacing
+        
+        let ratingConfig = RatingRendererConfig.default()
+        maxY += ratingConfig.starImage.size.height
+        
+        let photosCount = config.photoURLs.count
+        if photosCount > 0 {
+            maxY += ratingToPhotosSpacing
+            maxY += self.photoSize.height
+            maxY += photosToTextSpacing
+        } else {
+            maxY += ratingToTextSpacing
+        }
+        
+        var showShowMoreButton = false
+        if !config.reviewText.isEmpty() {
+            let fontLineHeight = config.reviewText.font()?.lineHeight ?? .zero
+            let actualTextHeight = config.reviewText.boundingRect(width: width).size.height
+            let currentTextHeight = fontLineHeight * CGFloat(config.maxLines)
+            
+            showShowMoreButton = config.maxLines != .zero && actualTextHeight > currentTextHeight
+            
+            let heightToDraw = showShowMoreButton ? currentTextHeight : actualTextHeight
+            maxY += config.reviewText.boundingRect(width: width, height: heightToDraw).size.height
+            maxY += reviewTextToCreatedSpacing
+        }
+        
+        if showShowMoreButton {
+            maxY += Self.showMoreButtonSize.height
+            maxY += showMoreToCreatedSpacing
+        }
+        
+        maxY += config.created.boundingRect(width: width).size.height
+        
+        let finalHeight = max(maxY, avatarSize.height + insets.top) + insets.bottom + showMoreToCreatedSpacing
+        
+        heightCache[key] = finalHeight
+        
+        return finalHeight
+    }
+    
+    func calculate(config: Config, maxWidth: CGFloat) -> CGFloat {
+        let contentX = Self.insets.left + Self.avatarSize.width + Self.avatarToUsernameSpacing
+        let width = maxWidth - contentX - Self.insets.right
+        
+        var maxY = Self.insets.top
         var showShowMoreButton = false
         
         avatarImageViewFrame = CGRect(
-            origin: CGPoint(x: insets.left, y: insets.top),
+            origin: CGPoint(x: Self.insets.left, y: Self.insets.top),
             size: Self.avatarSize
         )
-                
+        
         let userNameTextHeight = config.userName.boundingRect(width: width).size.height
         userNameLabelFrame = CGRect(
             origin: CGPoint(x: contentX, y: maxY),
             size: CGSize(width: width, height: userNameTextHeight)
         )
-        maxY = userNameLabelFrame.maxY + usernameToRatingSpacing
+        maxY = userNameLabelFrame.maxY + Self.usernameToRatingSpacing
         
         let ratingConfig = RatingRendererConfig.default()
         // Ширина - это ширина одной звезды и отступ, умноженные на количество звёзд и минус последний отступ
@@ -301,27 +379,27 @@ private final class ReviewCellLayout {
             origin: CGPoint(x: contentX, y: maxY),
             size: ratingImageSize
         )
-        maxY = ratingImageViewFrame.maxY + ratingToTextSpacing
+        maxY = ratingImageViewFrame.maxY + Self.ratingToTextSpacing
         
         let photos = config.photoURLs
         let photosCount = photos.count
-        let photoTopSpacing: CGFloat = photosCount > 0 ? ratingToPhotosSpacing : 0
+        let photoTopSpacing: CGFloat = photosCount > 0 ? Self.ratingToPhotosSpacing : 0
         
         if photosCount > 0 {
-            let totalWidth = CGFloat(photosCount) * Self.photoSize.width + CGFloat(photosCount - 1) * photosSpacing
+            let totalWidth = CGFloat(photosCount) * Self.photoSize.width + CGFloat(photosCount - 1) * Self.photosSpacing
             photosStackViewFrame = CGRect(
                 origin: CGPoint(x: contentX, y: maxY + photoTopSpacing),
                 size: CGSize(width: totalWidth, height: Self.photoSize.height)
             )
-            maxY = photosStackViewFrame.maxY + photosToTextSpacing
+            maxY = photosStackViewFrame.maxY + Self.photosToTextSpacing
         } else {
             photosStackViewFrame = .zero
         }
-
+        
         if !config.reviewText.isEmpty() {
             let fontLineHeight = config.reviewText.font()?.lineHeight ?? .zero
             let actualTextHeight = config.reviewText.boundingRect(width: width).size.height
-            
+        
             let currentTextHeight: CGFloat
             if config.maxLines == 0 {
                 // Максимально возможная высота текста, если бы ограничения не было.
@@ -330,35 +408,34 @@ private final class ReviewCellLayout {
                 // Высота текста с текущим ограничением по количеству строк.
                 currentTextHeight = fontLineHeight * CGFloat(config.maxLines)
             }
-            
+        
             // Показываем кнопку "Показать полностью...", если максимально возможная высота текста больше текущей.
             showShowMoreButton = config.maxLines != .zero && actualTextHeight > currentTextHeight
-
+        
             reviewTextLabelFrame = CGRect(
                 origin: CGPoint(x: contentX, y: maxY),
                 size: config.reviewText.boundingRect(width: width, height: currentTextHeight).size
             )
-            maxY = reviewTextLabelFrame.maxY + reviewTextToCreatedSpacing
+            maxY = reviewTextLabelFrame.maxY + Self.reviewTextToCreatedSpacing
         }
-
+        
         if showShowMoreButton {
             showMoreButtonFrame = CGRect(
                 origin: CGPoint(x: contentX, y: maxY),
                 size: Self.showMoreButtonSize
             )
-            maxY = showMoreButtonFrame.maxY + showMoreToCreatedSpacing
+            maxY = showMoreButtonFrame.maxY + Self.showMoreToCreatedSpacing
         } else {
             showMoreButtonFrame = .zero
         }
-
+        
         createdLabelFrame = CGRect(
             origin: CGPoint(x: contentX, y: maxY),
             size: config.created.boundingRect(width: width).size
         )
-
-        return max(maxY, avatarImageViewFrame.maxY) + insets.bottom + showMoreToCreatedSpacing
+        
+        return max(maxY, avatarImageViewFrame.maxY) + Self.insets.bottom + Self.showMoreToCreatedSpacing
     }
-
 }
 
 // MARK: - Typealias

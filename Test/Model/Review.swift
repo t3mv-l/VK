@@ -20,7 +20,7 @@ struct Review: Decodable {
     
 }
 
-struct PhotoURL: Decodable {
+struct PhotoURL: Decodable, Hashable {
     let google: String
     let yandex: String
 }
